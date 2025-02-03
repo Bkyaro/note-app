@@ -30,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         key={note.id}
                         onClick={() => note.id && onNoteSelect(note.id)}
                         onDoubleClick={() => {
-                            if (note.id && window.confirm("确认要删除该笔记吗?")) {
+                            if (note.id) {
                                 onNoteDelete(note.id);
                             }
                         }}

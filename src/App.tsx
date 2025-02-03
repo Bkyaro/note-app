@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './sidebar/Sidebar';
 import { EditPanel } from './editPanel/EditPanel';
+import { Modal } from './modals/Modal';
 import { NotesAPI } from './api';
 import { Note } from './types';
 
 const App: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [activeNote, setActiveNote] = useState<Note | null>(null);
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        type: 'delete' | null;
+        noteId?: number;
+    }>({
+        isOpen: false,
+        type: null
+    });
 
     const refreshNotes = () => {
         const notes = NotesAPI.getAllNotes();
@@ -45,9 +54,24 @@ const App: React.FC = () => {
         refreshNotes();
     };
 
-    const onNoteDelete = (noteId: number) => {
-        NotesAPI.deleteNote(noteId);
-        refreshNotes();
+    const handleDeleteClick = (noteId: number) => {
+        setModalState({
+            isOpen: true,
+            type: 'delete',
+            noteId
+        });
+    };
+
+    const handleModalConfirm = () => {
+        if (modalState.type === 'delete' && modalState.noteId) {
+            NotesAPI.deleteNote(modalState.noteId);
+            refreshNotes();
+        }
+        setModalState({ isOpen: false, type: null });
+    };
+
+    const handleModalCancel = () => {
+        setModalState({ isOpen: false, type: null });
     };
 
     return (
@@ -56,7 +80,7 @@ const App: React.FC = () => {
                 notes={notes}
                 onNoteSelect={onNoteSelect}
                 onNoteAdd={onNoteAdd}
-                onNoteDelete={onNoteDelete}
+                onNoteDelete={handleDeleteClick}
                 activeNoteId={activeNote?.id}
             />
             {notes.length > 0 ? (
@@ -65,6 +89,13 @@ const App: React.FC = () => {
                     onNoteEdit={onNoteEdit}
                 />
             ) : null}
+            <Modal
+                isOpen={modalState.isOpen}
+                title="删除确认"
+                message="确定要删除这条笔记吗？此操作无法撤销。"
+                onConfirm={handleModalConfirm}
+                onCancel={handleModalCancel}
+            />
         </div>
     );
 };
