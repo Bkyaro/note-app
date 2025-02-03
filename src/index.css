@@ -9,3 +9,7 @@ html, body {
 #app {
   @apply h-full;
 }
+
+* {
+  @apply transition-colors duration-200;
+}

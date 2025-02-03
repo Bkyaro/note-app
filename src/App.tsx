@@ -5,6 +5,7 @@ import { Modal } from './modals/Modal';
 import { NotesAPI } from './api';
 import { Note } from './types';
 import { Toolbar } from './toolbar/Toolbar';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const App: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
@@ -76,29 +77,31 @@ const App: React.FC = () => {
     };
 
     return (
-        <div className="flex h-full">
-            <Sidebar
-                notes={notes}
-                onNoteSelect={onNoteSelect}
-                onNoteAdd={onNoteAdd}
-                onNoteDelete={handleDeleteClick}
-                activeNoteId={activeNote?.id}
-            />
-            {notes.length > 0 ? (
-                <EditPanel
-                    activeNote={activeNote}
-                    onNoteEdit={onNoteEdit}
+        <ThemeProvider>
+            <div className="flex h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+                <Sidebar
+                    notes={notes}
+                    onNoteSelect={onNoteSelect}
+                    onNoteAdd={onNoteAdd}
+                    onNoteDelete={handleDeleteClick}
+                    activeNoteId={activeNote?.id}
                 />
-            ) : null}
-            <Modal
-                isOpen={modalState.isOpen}
-                title="删除确认"
-                message="确定要删除这条笔记吗？此操作无法撤销。"
-                onConfirm={handleModalConfirm}
-                onCancel={handleModalCancel}
-            />
-            <Toolbar />
-        </div>
+                {notes.length > 0 ? (
+                    <EditPanel
+                        activeNote={activeNote}
+                        onNoteEdit={onNoteEdit}
+                    />
+                ) : null}
+                <Modal
+                    isOpen={modalState.isOpen}
+                    title="删除确认"
+                    message="确定要删除这条笔记吗？此操作无法撤销。"
+                    onConfirm={handleModalConfirm}
+                    onCancel={handleModalCancel}
+                />
+                <Toolbar />
+            </div>
+        </ThemeProvider>
     );
 };
 
