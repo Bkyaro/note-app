@@ -4,6 +4,7 @@ import { EditPanel } from './editPanel/EditPanel';
 import { Modal } from './modals/Modal';
 import { NotesAPI } from './api';
 import { Note } from './types';
+import { Toolbar } from './toolbar/Toolbar';
 
 const App: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
@@ -96,6 +97,7 @@ const App: React.FC = () => {
                 onConfirm={handleModalConfirm}
                 onCancel={handleModalCancel}
             />
+            <Toolbar />
         </div>
     );
 };
