@@ -68,3 +68,19 @@ Consider a scenario where two notes are displayed on the sidebar. If you edit an
 Commit and push your latest your changes to public repository, and share your URL to us.
 
 Thank you and look forward to see your work!
+
+## CheckList
+Basic Tasks
+- [x] Fix the existing bugs happen to this note application
+- [x] Refactor this app to a React app with TypeScript
+- [x] Make sure the current feature is working fine after refactoring
+- [ ] Provide some improvements on the UI&UX
+- [x] adding confirmation/warning modal when user save/delete a note
+- [ ] Do NOT include a Save button in the program. The program should automatically save all editing data and reflect these changes on the sidebar.
+
+Bonus Tasks
+- [ ] Create a new button called Import Notes, which allow user to import notes in batch
+- [ ] Create a new button called Export Notes, which allow user to export all the notes from the local storage
+- [ ] Import & export files can be in csv or xml format
+- [ ] Minimize Unnecessary Re-renders.
+e.g. Consider a scenario where two notes are displayed on the sidebar. If you edit and save the first note, only the first note should be re-rendered. The second note should remain unaffected and not re-render.
