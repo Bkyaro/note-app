@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Note } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface EditPanelProps {
     activeNote: Note | null;
@@ -7,6 +8,7 @@ interface EditPanelProps {
 }
 
 export const EditPanel: React.FC<EditPanelProps> = ({ activeNote, onNoteEdit }) => {
+    const { t } = useTranslation();
     const [title, setTitle] = useState(activeNote?.title || '');
     const [body, setBody] = useState(activeNote?.body || '');
 
@@ -39,7 +41,7 @@ export const EditPanel: React.FC<EditPanelProps> = ({ activeNote, onNoteEdit }) 
                            text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600"
                 value={title}
                 onChange={handleTitleChange}
-                placeholder="新笔记..."
+                placeholder={t('note.new')}
             />
             <textarea
                 className="flex-grow text-base md:text-lg leading-relaxed mt-4 md:mt-8 resize-none border-none 
@@ -47,7 +49,7 @@ export const EditPanel: React.FC<EditPanelProps> = ({ activeNote, onNoteEdit }) 
                          placeholder-gray-400 dark:placeholder-gray-600"
                 value={body}
                 onChange={handleBodyChange}
-                placeholder="编辑笔记..."
+                placeholder={t('edit.placeholder')}
             />
         </div>
     );

@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { FiSun, FiMoon, FiDownload, FiUpload } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { changeLanguage } from '../i18n';
 
 interface ToolbarProps {
     onExport: () => void;
@@ -11,6 +13,7 @@ interface ToolbarProps {
 export const Toolbar: React.FC<ToolbarProps> = ({ onExport, onImport }) => {
     const toolbarRef = useRef<HTMLDivElement>(null);
     const { isDarkMode, toggleDarkMode } = useTheme();
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         const toolbar = toolbarRef.current;
@@ -43,6 +46,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onExport, onImport }) => {
         }
     }, []);
 
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'zh' ? 'en' : 'zh';
+        changeLanguage(newLang);
+    };
+
     return (
         <div
             ref={toolbarRef}
@@ -60,16 +68,23 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onExport, onImport }) => {
             <button
                 onClick={onExport}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
-                title="导出笔记"
+                title={t('export.note')}
             >
                 <FiDownload className="w-5 h-5" />
             </button>
             <button
                 onClick={onImport}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
-                title="导入笔记"
+                title={t('import.note')}
             >
                 <FiUpload className="w-5 h-5" />
+            </button>
+            <button
+                onClick={toggleLanguage}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
+                title={t('switch.language')}
+            >
+                {i18n.language === 'zh' ? 'EN' : '中'}
             </button>
         </div>
     );

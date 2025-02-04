@@ -2,6 +2,7 @@ import React from 'react';
 import { Note } from '../types';
 import { useScrollShadow } from '../hooks/useScrollShadow';
 import { FiTrash2 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
     notes: Note[];
@@ -19,6 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeNoteId
 }) => {
     const scrollContainerRef = useScrollShadow();
+    const { t } = useTranslation();
 
     return (
         <div className="h-full border-r-2 border-gray-200 dark:border-gray-700 
@@ -29,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={onNoteAdd}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded w-full text-lg"
                 >
-                    添加新的笔记 📒
+                    {t('sidebar.add')}
                 </button>
             </div>
 

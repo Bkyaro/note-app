@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './i18n';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from './sidebar/Sidebar';
 import { EditPanel } from './editPanel/EditPanel';
 import { Modal } from './modals/Modal';
@@ -9,6 +11,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import gsap from 'gsap';
 
 const App: React.FC = () => {
+    const { t } = useTranslation();
     const [notes, setNotes] = useState<Note[]>([]);
     const [activeNote, setActiveNote] = useState<Note | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -43,8 +46,8 @@ const App: React.FC = () => {
 
     const onNoteAdd = () => {
         const newNote = {
-            title: "新建笔记",
-            body: "开始记录..."
+            title: t('note.new'),
+            body: t('note.start')
         };
         NotesAPI.saveNote(newNote);
         refreshNotes();
@@ -178,7 +181,7 @@ const App: React.FC = () => {
 
     const handleImportConfirm = () => {
         if (!importFile) {
-            alert('请选择一个文件');
+            alert(t('select.file'));
             return;
         }
         const reader = new FileReader();
@@ -205,7 +208,7 @@ const App: React.FC = () => {
             refreshNotes();
             setModalState({ isOpen: false, type: null });
             setImportFile(null);
-            setNotification("导入成功！");
+            setNotification(t('import.success'));
         };
         reader.readAsText(importFile);
     };
@@ -226,10 +229,8 @@ const App: React.FC = () => {
                             opacity: 0,
                             duration: 0.5,
                             ease: "power3.in",
-                            delay: 2,
-                            onComplete: () => {
-                                setNotification("");
-                            }
+                            delay: 2.5,
+                            onComplete: () => setNotification("")
                         });
                     }
                 }
@@ -301,8 +302,8 @@ const App: React.FC = () => {
                 {modalState.isOpen && modalState.type === 'delete' && (
                     <Modal
                         isOpen={modalState.isOpen}
-                        title="删除确认"
-                        message="确定要删除这条笔记吗？此操作无法撤销。"
+                        title={t('delete.confirmTitle')}
+                        message={t('delete.confirmMessage')}
                         onConfirm={handleModalConfirm}
                         onCancel={handleModalCancel}
                     />
@@ -310,8 +311,8 @@ const App: React.FC = () => {
                 {modalState.isOpen && modalState.type === 'export' && (
                     <Modal
                         isOpen={modalState.isOpen}
-                        title="导出笔记"
-                        message="请选择导出格式"
+                        title={t('export.note')}
+                        message={t('export.message')}
                         onConfirm={() => {}}
                         onCancel={handleModalCancel}
                     >
@@ -320,19 +321,19 @@ const App: React.FC = () => {
                                 onClick={() => handleExportConfirm('csv')}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
-                                导出 CSV
+                                {t('export.csv')}
                             </button>
                             <button
                                 onClick={() => handleExportConfirm('xml')}
                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                             >
-                                导出 XML
+                                {t('export.xml')}
                             </button>
                             <button
                                 onClick={handleModalCancel}
                                 className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
                             >
-                                取消
+                                {t('delete.cancel')}
                             </button>
                         </div>
                     </Modal>
@@ -340,8 +341,8 @@ const App: React.FC = () => {
                 {modalState.isOpen && modalState.type === 'import' && (
                     <Modal
                         isOpen={modalState.isOpen}
-                        title="导入备份文件"
-                        message="请选择要上传的 CSV 或 XML 格式的文件"
+                        title={t('import.note')}
+                        message={t('import.message')}
                         onConfirm={handleImportConfirm}
                         onCancel={handleModalCancel}
                     >
@@ -361,7 +362,7 @@ const App: React.FC = () => {
                                 htmlFor="importFileInput"
                                 className="cursor-pointer inline-block px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
                             >
-                                {importFile ? importFile.name : "点击选择文件"}
+                                {importFile ? importFile.name : t('select.file')}
                             </label>
                         </div>
                         <div className="flex justify-end space-x-4">
@@ -369,13 +370,13 @@ const App: React.FC = () => {
                                 onClick={handleImportConfirm}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
-                                导入
+                                {t('import.note')}
                             </button>
                             <button
                                 onClick={handleModalCancel}
                                 className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
                             >
-                                取消
+                                {t('delete.cancel')}
                             </button>
                         </div>
                     </Modal>

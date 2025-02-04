@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 
 interface ModalProps {
@@ -18,6 +19,7 @@ export const Modal: React.FC<ModalProps> = ({
     onCancel,
     children
 }) => {
+    const { t } = useTranslation();
     if (!isOpen) return null;
 
     return createPortal(
@@ -33,13 +35,13 @@ export const Modal: React.FC<ModalProps> = ({
                             onClick={onCancel}
                             className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
                         >
-                            取消
+                            {t('delete.cancel')}
                         </button>
                         <button
                             onClick={onConfirm}
                             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                         >
-                            确认
+                            {t('delete.confirm')}
                         </button>
                     </div>
                 )}
