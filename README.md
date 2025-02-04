@@ -74,9 +74,9 @@ Basic Tasks
 - [x] Fix the existing bugs happen to this note application
 - [x] Refactor this app to a React app with TypeScript
 - [x] Make sure the current feature is working fine after refactoring
-- [ ] Provide some improvements on the UI&UX
+- [x] Provide some improvements on the UI&UX
 - [x] adding confirmation/warning modal when user save/delete a note
-- [ ] Do NOT include a Save button in the program. The program should automatically save all editing data and reflect these changes on the sidebar.
+- [x] Do NOT include a Save button in the program. The program should automatically save all editing data and reflect these changes on the sidebar.
 
 Bonus Tasks
 - [ ] Create a new button called Import Notes, which allow user to import notes in batch
