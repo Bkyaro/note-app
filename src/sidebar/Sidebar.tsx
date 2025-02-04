@@ -41,12 +41,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             }
                             dark:border-gray-700`}
                     >
-                        <div className="text-lg dark:text-white">{note.title}</div>
-                        <div className="text-gray-600 dark:text-gray-400">
+                        <div className="text-ellipsis overflow-hidden text-lg dark:text-white">{note.title}</div>
+                        <div className="text-ellipsis overflow-hidden text-gray-600 dark:text-gray-400">
                             {note.body.substring(0, 60)}
                             {note.body.length > 60 ? "..." : ""}
                         </div>
-                        <div className="text-gray-400 dark:text-gray-500 italic text-right text-sm">
+                        <div className=" text-gray-400 dark:text-gray-500 italic text-right text-sm">
                             {new Date(note.updated!).toLocaleString()}
                         </div>
                     </div>
