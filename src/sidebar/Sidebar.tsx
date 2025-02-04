@@ -1,6 +1,7 @@
 import React from 'react';
 import { Note } from '../types';
 import { useScrollShadow } from '../hooks/useScrollShadow';
+import { FiTrash2 } from 'react-icons/fi';
 
 interface SidebarProps {
     notes: Note[];
@@ -50,14 +51,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div
                         key={note.id}
                         onClick={() => note.id && onNoteSelect(note.id)}
-                        onDoubleClick={() => {
-                            if (note.id) {
-                                onNoteDelete(note.id);
-                            }
-                        }}
                         className={`
-                            cursor-pointer border border-gray-200 dark:border-gray-700 
-                            rounded-lg p-4 hover:shadow-md transition-shadow duration-200
+                            relative cursor-pointer border border-gray-200 dark:border-gray-700 
+                            rounded-lg p-4 hover:shadow-md transition-shadow duration-200 group
                             ${note.id === activeNoteId
                                 ? 'bg-gray-100 dark:bg-gray-800 border-emerald-500 dark:border-emerald-600'
                                 : 'hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -73,6 +69,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <div className="text-gray-400 dark:text-gray-500 text-xs italic text-right">
                             {new Date(note.updated!).toLocaleString()}
                         </div>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onNoteDelete(note.id!);
+                            }}
+                            className="absolute bottom-2 left-2 p-1 bg-slate-400 text-white rounded-md
+                                       opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                            title="删除笔记"
+                        >
+                            <FiTrash2 className="w-4 h-4" />
+                        </button>
                     </div>
                 ))}
 
