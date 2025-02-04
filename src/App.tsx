@@ -13,7 +13,7 @@ const App: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [modalState, setModalState] = useState<{
         isOpen: boolean;
-        type: 'delete' | null;
+        type: 'delete' | 'export' | null;
         noteId?: number;
     }>({
         isOpen: false,
@@ -21,10 +21,10 @@ const App: React.FC = () => {
     });
 
     const refreshNotes = () => {
-        const notes = NotesAPI.getAllNotes();
-        setNotes(notes);
-        if (notes.length > 0 && !activeNote) {
-            setActiveNote(notes[0]);
+        const allNotes = NotesAPI.getAllNotes();
+        setNotes(allNotes);
+        if (allNotes.length > 0 && !activeNote) {
+            setActiveNote(allNotes[0]);
         }
     };
 
@@ -40,7 +40,7 @@ const App: React.FC = () => {
     const onNoteAdd = () => {
         const newNote = {
             title: "新建笔记",
-            body: "开始记录...",
+            body: "开始记录..."
         };
         NotesAPI.saveNote(newNote);
         refreshNotes();
@@ -48,7 +48,6 @@ const App: React.FC = () => {
 
     const onNoteEdit = (title: string, body: string) => {
         if (!activeNote) return;
-
         NotesAPI.saveNote({
             id: activeNote.id,
             title,
@@ -66,7 +65,7 @@ const App: React.FC = () => {
     };
 
     const handleModalConfirm = () => {
-        if (modalState.type === 'delete' && modalState.noteId) {
+        if (modalState.type === 'delete' && modalState.noteId !== undefined) {
             NotesAPI.deleteNote(modalState.noteId);
             refreshNotes();
         }
@@ -74,6 +73,57 @@ const App: React.FC = () => {
     };
 
     const handleModalCancel = () => {
+        setModalState({ isOpen: false, type: null });
+    };
+
+    const handleExportClick = () => {
+        setModalState({
+            isOpen: true,
+            type: 'export'
+        });
+    };
+
+    const handleExportConfirm = (format: 'csv' | 'xml') => {
+        if (notes.length === 0) {
+            setModalState({ isOpen: false, type: null });
+            return;
+        }
+
+        if (format === 'csv') {
+            let csvContent = "id,title,body,updated\n";
+            notes.forEach(note => {
+                csvContent += `${note.id},"${note.title.replace(/"/g, '""')}","${note.body.replace(/"/g, '""')}",${note.updated}\n`;
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'notes.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } else if (format === 'xml') {
+            let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>\n<notes>\n`;
+            notes.forEach(note => {
+                xmlContent += "  <note>\n";
+                xmlContent += `    <id>${note.id}</id>\n`;
+                xmlContent += `    <title><![CDATA[${note.title}]]></title>\n`;
+                xmlContent += `    <body><![CDATA[${note.body}]]></body>\n`;
+                xmlContent += `    <updated>${note.updated}</updated>\n`;
+                xmlContent += "  </note>\n";
+            });
+            xmlContent += `</notes>`;
+            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'notes.xml');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
         setModalState({ isOpen: false, type: null });
     };
 
@@ -133,14 +183,46 @@ const App: React.FC = () => {
                     ) : null}
                 </div>
 
-                <Modal
-                    isOpen={modalState.isOpen}
-                    title="删除确认"
-                    message="确定要删除这条笔记吗？此操作无法撤销。"
-                    onConfirm={handleModalConfirm}
-                    onCancel={handleModalCancel}
-                />
-                <Toolbar />
+                {modalState.isOpen && modalState.type === 'delete' && (
+                    <Modal
+                        isOpen={modalState.isOpen}
+                        title="删除确认"
+                        message="确定要删除这条笔记吗？此操作无法撤销。"
+                        onConfirm={handleModalConfirm}
+                        onCancel={handleModalCancel}
+                    />
+                )}
+                {modalState.isOpen && modalState.type === 'export' && (
+                    <Modal
+                        isOpen={modalState.isOpen}
+                        title="导出笔记"
+                        message="请选择导出格式"
+                        onConfirm={() => {}}
+                        onCancel={handleModalCancel}
+                    >
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={() => handleExportConfirm('csv')}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                导出 CSV
+                            </button>
+                            <button
+                                onClick={() => handleExportConfirm('xml')}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                                导出 XML
+                            </button>
+                            <button
+                                onClick={handleModalCancel}
+                                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
+                            >
+                                取消
+                            </button>
+                        </div>
+                    </Modal>
+                )}
+                <Toolbar onExport={handleExportClick} />
             </div>
         </ThemeProvider>
     );

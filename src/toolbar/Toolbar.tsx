@@ -3,7 +3,11 @@ import gsap from 'gsap';
 import { FiSun, FiMoon, FiDownload, FiUpload } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
 
-export const Toolbar: React.FC = () => {
+interface ToolbarProps {
+    onExport: () => void;
+}
+
+export const Toolbar: React.FC<ToolbarProps> = ({ onExport }) => {
     const toolbarRef = useRef<HTMLDivElement>(null);
     const { isDarkMode, toggleDarkMode } = useTheme();
 
@@ -11,7 +15,6 @@ export const Toolbar: React.FC = () => {
         const toolbar = toolbarRef.current;
         if (!toolbar) return;
 
-        // 只在大屏幕设备上应用动画
         const mediaQuery = window.matchMedia('(min-width: 768px)');
 
         if (mediaQuery.matches) {
@@ -53,7 +56,10 @@ export const Toolbar: React.FC = () => {
             >
                 {isDarkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
             </button>
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">
+            <button
+                onClick={onExport}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
+            >
                 <FiDownload className="w-5 h-5" />
             </button>
             <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">

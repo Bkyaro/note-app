@@ -7,6 +7,7 @@ interface ModalProps {
     message: string;
     onConfirm: () => void;
     onCancel: () => void;
+    children?: React.ReactNode;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -14,7 +15,8 @@ export const Modal: React.FC<ModalProps> = ({
     title,
     message,
     onConfirm,
-    onCancel
+    onCancel,
+    children
 }) => {
     if (!isOpen) return null;
 
@@ -23,21 +25,24 @@ export const Modal: React.FC<ModalProps> = ({
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h2 className="text-xl font-bold mb-4 dark:text-white">{title}</h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">{message}</p>
-                <div className="flex justify-end space-x-4">
-                    <button
-                        onClick={onCancel}
-                        className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 
-                                 dark:hover:text-gray-200 rounded"
-                    >
-                        取消
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                        确认
-                    </button>
-                </div>
+                {children ? (
+                    children
+                ) : (
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={onCancel}
+                            className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
+                        >
+                            取消
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                        >
+                            确认
+                        </button>
+                    </div>
+                )}
             </div>
         </div>,
         document.body
