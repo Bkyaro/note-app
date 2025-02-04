@@ -32,7 +32,7 @@ export const EditPanel: React.FC<EditPanelProps> = ({ activeNote, onNoteEdit }) 
     if (!activeNote) return null;
 
     return (
-        <div className="flex flex-col p-4 md:p-8 flex-grow bg-white dark:bg-gray-900 h-full">
+        <div className="flex flex-col p-12 md:p-8 flex-grow bg-white dark:bg-gray-900 h-full">
             <input
                 type="text"
                 className="text-2xl md:text-4xl font-bold border-none outline-none w-full bg-transparent
