@@ -21,10 +21,8 @@ export const useScrollShadow = () => {
         if (!container) return;
 
         container.addEventListener('scroll', handleScroll);
-        // 初始化时触发一次
         handleScroll();
 
-        // 监听容器内容变化
         const resizeObserver = new ResizeObserver(handleScroll);
         resizeObserver.observe(container);
 
