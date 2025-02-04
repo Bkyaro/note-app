@@ -83,12 +83,12 @@ const App: React.FC = () => {
 
     return (
         <ThemeProvider>
-            <div className="flex h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
-                <button 
+            <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative overflow-hidden">
+                <button
                     onClick={toggleSidebar}
                     className={`
-                        md:hidden fixed top-[50%] -translate-y-1/2 z-50 
-                        p-1.5 rounded-r bg-gray-100 dark:bg-gray-800
+                        py-6 px-2 md:hidden fixed top-[50%] -translate-y-1/2 z-50 
+                        rounded-r bg-gray-100 dark:bg-gray-800
                         transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-700
                         ${isSidebarOpen ? 'left-[75vw]' : 'left-0'}
                     `}
@@ -118,7 +118,7 @@ const App: React.FC = () => {
                 </div>
 
                 {isSidebarOpen && (
-                    <div 
+                    <div
                         className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
                         onClick={() => setIsSidebarOpen(false)}
                     />
