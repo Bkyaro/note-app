@@ -10,6 +10,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 const App: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [activeNote, setActiveNote] = useState<Note | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [modalState, setModalState] = useState<{
         isOpen: boolean;
         type: 'delete' | null;
@@ -76,22 +77,62 @@ const App: React.FC = () => {
         setModalState({ isOpen: false, type: null });
     };
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     return (
         <ThemeProvider>
-            <div className="flex h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-                <Sidebar
-                    notes={notes}
-                    onNoteSelect={onNoteSelect}
-                    onNoteAdd={onNoteAdd}
-                    onNoteDelete={handleDeleteClick}
-                    activeNoteId={activeNote?.id}
-                />
-                {notes.length > 0 ? (
-                    <EditPanel
-                        activeNote={activeNote}
-                        onNoteEdit={onNoteEdit}
+            <div className="flex h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
+                <button 
+                    onClick={toggleSidebar}
+                    className={`
+                        md:hidden fixed top-[50%] -translate-y-1/2 z-50 
+                        p-1.5 rounded-r bg-gray-100 dark:bg-gray-800
+                        transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-700
+                        ${isSidebarOpen ? 'left-[75vw]' : 'left-0'}
+                    `}
+                >
+                    <div className="flex gap-1.5">
+                        <div className="w-0.5 h-4 bg-gray-600 dark:bg-gray-400"></div>
+                        <div className="w-0.5 h-4 bg-gray-600 dark:bg-gray-400"></div>
+                    </div>
+                </button>
+
+                <div className={`
+                    transition-transform duration-300 ease-in-out
+                    fixed md:relative z-40 md:translate-x-0 h-full
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    md:w-auto w-[75vw]
+                `}>
+                    <Sidebar
+                        notes={notes}
+                        onNoteSelect={(id) => {
+                            onNoteSelect(id);
+                            setIsSidebarOpen(false);
+                        }}
+                        onNoteAdd={onNoteAdd}
+                        onNoteDelete={handleDeleteClick}
+                        activeNoteId={activeNote?.id}
                     />
-                ) : null}
+                </div>
+
+                {isSidebarOpen && (
+                    <div 
+                        className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
+                <div className="flex-1">
+                    {notes.length > 0 ? (
+                        <EditPanel
+                            activeNote={activeNote}
+                            onNoteEdit={onNoteEdit}
+                        />
+                    ) : null}
+                </div>
+
                 <Modal
                     isOpen={modalState.isOpen}
                     title="删除确认"

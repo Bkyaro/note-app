@@ -17,7 +17,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeNoteId
 }) => {
     return (
-        <div className="border-r-2 border-gray-200 dark:border-gray-700 flex-shrink-0 overflow-y-auto p-4 w-[300px] bg-white dark:bg-gray-900">
+        <div className="h-full border-r-2 border-gray-200 dark:border-gray-700 
+                flex-shrink-0 overflow-y-auto p-4 bg-white dark:bg-gray-900
+                w-full md:w-[300px]">
             <button
                 onClick={onNoteAdd}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded w-full mb-4 text-lg"
