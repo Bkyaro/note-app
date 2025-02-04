@@ -79,8 +79,8 @@ Basic Tasks
 - [x] Do NOT include a Save button in the program. The program should automatically save all editing data and reflect these changes on the sidebar.
 
 Bonus Tasks
-- [ ] Create a new button called Import Notes, which allow user to import notes in batch
-- [ ] Create a new button called Export Notes, which allow user to export all the notes from the local storage
-- [ ] Import & export files can be in csv or xml format
+- [x] Create a new button called Import Notes, which allow user to import notes in batch
+- [x] Create a new button called Export Notes, which allow user to export all the notes from the local storage
+- [x] Import & export files can be in csv or xml format
 - [ ] Minimize Unnecessary Re-renders.
 e.g. Consider a scenario where two notes are displayed on the sidebar. If you edit and save the first note, only the first note should be re-rendered. The second note should remain unaffected and not re-render.
