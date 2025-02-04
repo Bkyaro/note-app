@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './sidebar/Sidebar';
 import { EditPanel } from './editPanel/EditPanel';
 import { Modal } from './modals/Modal';
@@ -6,6 +6,7 @@ import { NotesAPI } from './api';
 import { Note } from './types';
 import { Toolbar } from './toolbar/Toolbar';
 import { ThemeProvider } from './contexts/ThemeContext';
+import gsap from 'gsap';
 
 const App: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
@@ -13,12 +14,15 @@ const App: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [modalState, setModalState] = useState<{
         isOpen: boolean;
-        type: 'delete' | 'export' | null;
+        type: 'delete' | 'export' | 'import' | null;
         noteId?: number;
     }>({
         isOpen: false,
         type: null
     });
+    const [importFile, setImportFile] = useState<File | null>(null);
+    const [notification, setNotification] = useState<string>("");
+    const notificationRef = useRef<HTMLDivElement>(null);
 
     const refreshNotes = () => {
         const allNotes = NotesAPI.getAllNotes();
@@ -74,6 +78,7 @@ const App: React.FC = () => {
 
     const handleModalCancel = () => {
         setModalState({ isOpen: false, type: null });
+        setImportFile(null);
     };
 
     const handleExportClick = () => {
@@ -127,6 +132,111 @@ const App: React.FC = () => {
         setModalState({ isOpen: false, type: null });
     };
 
+    const handleImportClick = () => {
+        setModalState({
+            isOpen: true,
+            type: 'import'
+        });
+    };
+
+    const parseCSV = (csvText: string): Array<{ title: string, body: string }> => {
+        const rows = csvText.split('\n').filter(row => row.trim() !== '');
+        const result: Array<{ title: string, body: string }> = [];
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.split(/,(?=(?:"[^"]*"|[^"]*$))/);
+            if (cells.length >= 4) {
+                let title = cells[1].trim();
+                let body = cells[2].trim();
+                if (title.startsWith('"') && title.endsWith('"')) {
+                    title = title.slice(1, -1).replace(/""/g, '"');
+                }
+                if (body.startsWith('"') && body.endsWith('"')) {
+                    body = body.slice(1, -1).replace(/""/g, '"');
+                }
+                result.push({ title, body });
+            }
+        }
+        return result;
+    };
+
+    const parseXML = (xmlText: string): Array<{ title: string, body: string }> => {
+        const result: Array<{ title: string, body: string }> = [];
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+        const noteElements = xmlDoc.getElementsByTagName("note");
+        for (let i = 0; i < noteElements.length; i++) {
+            const noteElem = noteElements[i];
+            const titleElem = noteElem.getElementsByTagName("title")[0];
+            const bodyElem = noteElem.getElementsByTagName("body")[0];
+            const title = titleElem ? titleElem.textContent || "" : "";
+            const body = bodyElem ? bodyElem.textContent || "" : "";
+            result.push({ title, body });
+        }
+        return result;
+    };
+
+    const handleImportConfirm = () => {
+        if (!importFile) {
+            alert('请选择一个文件');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target?.result as string;
+            const fileName = importFile.name.toLowerCase();
+            let importedNotes: Array<{ title: string, body: string }> = [];
+
+            if (fileName.endsWith('.csv')) {
+                importedNotes = parseCSV(content);
+            } else if (fileName.endsWith('.xml')) {
+                importedNotes = parseXML(content);
+            } else {
+                alert("仅支持 CSV 或 XML 格式的文件");
+                return;
+            }
+
+            importedNotes.forEach(note => {
+                NotesAPI.saveNote({
+                    title: note.title,
+                    body: note.body
+                });
+            });
+            refreshNotes();
+            setModalState({ isOpen: false, type: null });
+            setImportFile(null);
+            setNotification("导入成功！");
+        };
+        reader.readAsText(importFile);
+    };
+
+    useEffect(() => {
+        if (notification && notificationRef.current) {
+            gsap.fromTo(
+                notificationRef.current,
+                { y: -50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "power3.out",
+                    onComplete: () => {
+                        gsap.to(notificationRef.current, {
+                            y: -50,
+                            opacity: 0,
+                            duration: 0.5,
+                            ease: "power3.in",
+                            delay: 2,
+                            onComplete: () => {
+                                setNotification("");
+                            }
+                        });
+                    }
+                }
+            );
+        }
+    }, [notification]);
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
@@ -134,6 +244,11 @@ const App: React.FC = () => {
     return (
         <ThemeProvider>
             <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative overflow-hidden">
+                {notification && (
+                    <div ref={notificationRef} className="fixed top-0 left-1/2 transform -translate-x-1/2 mt-4 px-6 py-3 bg-green-500 text-white rounded-b shadow-lg z-50">
+                        {notification}
+                    </div>
+                )}
                 <button
                     onClick={toggleSidebar}
                     className={`
@@ -222,7 +337,50 @@ const App: React.FC = () => {
                         </div>
                     </Modal>
                 )}
-                <Toolbar onExport={handleExportClick} />
+                {modalState.isOpen && modalState.type === 'import' && (
+                    <Modal
+                        isOpen={modalState.isOpen}
+                        title="导入备份文件"
+                        message="请选择要上传的 CSV 或 XML 格式的文件"
+                        onConfirm={handleImportConfirm}
+                        onCancel={handleModalCancel}
+                    >
+                        <div className="mb-4">
+                            <input
+                                id="importFileInput"
+                                type="file"
+                                accept=".csv,.xml"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files.length > 0) {
+                                        setImportFile(e.target.files[0]);
+                                    }
+                                }}
+                            />
+                            <label
+                                htmlFor="importFileInput"
+                                className="cursor-pointer inline-block px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                            >
+                                {importFile ? importFile.name : "点击选择文件"}
+                            </label>
+                        </div>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={handleImportConfirm}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                导入
+                            </button>
+                            <button
+                                onClick={handleModalCancel}
+                                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded"
+                            >
+                                取消
+                            </button>
+                        </div>
+                    </Modal>
+                )}
+                <Toolbar onExport={handleExportClick} onImport={handleImportClick} />
             </div>
         </ThemeProvider>
     );

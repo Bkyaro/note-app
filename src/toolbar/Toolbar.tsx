@@ -5,9 +5,10 @@ import { useTheme } from '../contexts/ThemeContext';
 
 interface ToolbarProps {
     onExport: () => void;
+    onImport: () => void;
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({ onExport }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ onExport, onImport }) => {
     const toolbarRef = useRef<HTMLDivElement>(null);
     const { isDarkMode, toggleDarkMode } = useTheme();
 
@@ -59,10 +60,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onExport }) => {
             <button
                 onClick={onExport}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
+                title="导出笔记"
             >
                 <FiDownload className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">
+            <button
+                onClick={onImport}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300"
+                title="导入笔记"
+            >
                 <FiUpload className="w-5 h-5" />
             </button>
         </div>
