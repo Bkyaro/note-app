@@ -30,7 +30,9 @@ const App: React.FC = () => {
     const refreshNotes = () => {
         const allNotes = NotesAPI.getAllNotes();
         setNotes(allNotes);
-        if (allNotes.length > 0 && !activeNote) {
+        if (allNotes.length === 0) {
+            setActiveNote(null);
+        } else if (!activeNote || !allNotes.some(note => note.id === activeNote.id)) {
             setActiveNote(allNotes[0]);
         }
     };
